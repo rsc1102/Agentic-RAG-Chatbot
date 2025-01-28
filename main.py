@@ -1,7 +1,11 @@
 import streamlit as st
 from chat import stream_graph_updates
 import uuid
-from document_handler import document_parser
+from document_handler import document_parser, vectorize_document
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 if "client_id" not in st.session_state:
     st.session_state.client_id = uuid.uuid4().hex    
@@ -9,7 +13,8 @@ if "client_id" not in st.session_state:
 st.title("🤖 Agentic RAG Chatbot 💬")
 uploaded_file = st.file_uploader("Upload your files", type=("txt","pdf"))
 if uploaded_file is not None:
-    docs = document_parser(uploaded_file)
+    docs = document_parser(uploaded_file,st.session_state.client_id)
+    vectorize_document(docs)
 
 # Initialize chat history
 if "messages" not in st.session_state:
