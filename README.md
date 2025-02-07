@@ -4,7 +4,7 @@ This repository houses code for an Agentic RAG system, which conducts retrieval-
 ![graph_image](.github/agentic_graph.png)
 
 ## Install
-1. Clone the Github repository:
+1. Clone the GitHub repository:
 ```bash
 git clone https://github.com/rsc1102/Agentic-RAG-Chatbot.git
 ```
@@ -12,7 +12,7 @@ git clone https://github.com/rsc1102/Agentic-RAG-Chatbot.git
 ```bash
 pip install -r requirements.txt
 ```
-3. Setup enviornment variables in the `.streamlit/secrets.toml`:
+3. Setup environment variables in the `.streamlit/secrets.toml`:
 ```toml
 OPENAI_API_KEY="<openai-api-key>"
 LANGCHAIN_TRACING_V2="true"
@@ -27,7 +27,7 @@ ASTRA_DB_APPLICATION_TOKEN="<astradb-app-token>"
 ## Usage
 1. Start the streamlit server: `streamlit run main.py`
 2. Open url: `http://localhost:8501/`
-3. For RAG upload the relevant documents.
+3. For RAG, upload the relevant documents.
 4. Use the Chatbot.
 
 ## Directory Structure
@@ -45,4 +45,4 @@ Directory structure:
 ```
 
 ## Contributions
-I’d greatly appreciate any feedback or contributions! Feel free to open a PR, and I’ll be happy to review it. 😊
+I’d greatly appreciate any feedback or contributions! Feel free to open a PR, I’ll gladly review it. 😊
