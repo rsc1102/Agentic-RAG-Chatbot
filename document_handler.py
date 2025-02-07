@@ -6,10 +6,11 @@ from langchain_core.documents.base import Blob
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_astradb import AstraDBVectorStore
-import os
+from langchain.tools.retriever import create_retriever_tool
 
+import streamlit as st
 
-class ParseDocument:
+class DocumentParser:
     """Document Parser class. Supports pdf and txt documents."""
     def __init__(self):
         self.pdf_parser = PyPDFParser()
@@ -32,7 +33,7 @@ class ParseDocument:
         raise Exception(f"document not of the type ['pdf','txt']. Provided document type: {document.type}")
     
 
-class VectorizeDocument:
+class DocumentVectorizer:
     """Document Vectorizing class. Uses AstraDB as a vector store.
     """
     def __init__(self):
@@ -44,23 +45,33 @@ class VectorizeDocument:
         self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
         
         # checking env variables
-        if not os.environ.get("ASTRA_DB_API_ENDPOINT"):
+        if not st.secrets.get("ASTRA_DB_API_ENDPOINT"):
             raise Exception("ASTRA_DB_API_ENDPOINT not specified")
-        if not os.environ.get("ASTRA_DB_COLLECTION_NAME"):
+        if not st.secrets.get("ASTRA_DB_COLLECTION_NAME"):
             raise Exception("ASTRA_DB_COLLECTION_NAME not specified")
-        if not os.environ.get("ASTRA_DB_APPLICATION_TOKEN"):
+        if not st.secrets.get("ASTRA_DB_APPLICATION_TOKEN"):
             raise Exception("ASTRA_DB_APPLICATION_TOKEN not specified")
         
         self.vector_store = AstraDBVectorStore(
                             embedding = self.embeddings,
-                            api_endpoint = os.environ.get("ASTRA_DB_API_ENDPOINT"),
-                            collection_name=os.environ.get("ASTRA_DB_COLLECTION_NAME"),
-                            token=os.environ.get("ASTRA_DB_APPLICATION_TOKEN"),
+                            api_endpoint = st.secrets.get("ASTRA_DB_API_ENDPOINT"),
+                            collection_name=st.secrets.get("ASTRA_DB_COLLECTION_NAME"),
+                            token=st.secrets.get("ASTRA_DB_APPLICATION_TOKEN"),
                         )
+
+        self.retriever = self.vector_store.as_retriever()
     
     def __call__(self,documents):
         self.vector_store.add_documents(documents=documents)   
+    
+    def get_retriever_tool(self):
+        return create_retriever_tool(
+                    self.retriever,
+                    "retrieve_documents",
+                    "Search and return information from uploaded documents",
+                )
 
-document_parser = ParseDocument()
-vectorize_document = VectorizeDocument()
+parse_document = DocumentParser()
+vectorize_document = DocumentVectorizer()
+retriever_tool = vectorize_document.get_retriever_tool()
         
